@@ -64,6 +64,21 @@ router.post('/savesession', async (req, res) => {
   }
 });
 
+router.get('/recentsession',async (req,res)=>{
+  try {
 
+    const jwtoken = req.cookies.jwtoken;
+    const decodedToken = jwt.verify(jwtoken, process.env.SECRET_KEY);
+    const id = decodedToken._id;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const recent_session = await user.sessions[user.sessions.length - 1];
+    res.status(201).json(recent_session)
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+})
 
 export default router;
